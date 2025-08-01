@@ -57,13 +57,13 @@ jobs:
         with:
           name: vector-${{ matrix.target }}-${{ matrix.arch }}-release-unsigned.apk
           path: |
-            vector-app/build/outputs/apk/*/release/*-${{ matrix.arch }}-*.apk
+            vector-app/build/outputs/apk/*/release/*.apk
 
       - name: Find APKs
         run: |
           APK_FILE=$(find vector-app/build/outputs/apk/ -name '*.apk')
           echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
-          echo "APK_FILE_NAME=$(basename $APK_FILE .apk)" >> $GITHUB_ENV
+          echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV
 
       - name: Show APKs SHA256
         if: success()

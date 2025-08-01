@@ -40,7 +40,7 @@ jobs:
           find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/applicationId "im.vector.app"/applicationId "com.tencent.rtx"/g' $F;done
           find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/enable true/enable !gradle.startParameter.taskNames.any { it.toLowerCase().contains("bundle") }/g' $F;done
           find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/"app_name", "Element"/"app_name", "腾讯通rtx"/g' $F;done
-          find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i -e 's/"armeabi-v7a", "x86",//g' -e "s/'arm64-v8a', 'x86_64'/'arm64-v8a'/g" $F;done
+          find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i -e 's/"armeabi-v7a", "x86",//g' -e 's/"arm64-v8a", "x86_64"/"arm64-v8a"/g' -e "s/'arm64-v8a', 'x86_64'/'arm64-v8a'/g" $F;done
           find /home/runner/ -iname "config.xml"  -type f|while read F;do sed -i 's#https://matrix.org#https://tim.ipv9.win#g' $F;done
           echo ${{ secrets.SIGNING_KEY }} | base64 --decode > /home/runner/work/element-android/element-android/keystore.jks
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#pathTo.keystore#/home/runner/work/element-android/element-android/keystore.jks#g' $F;done

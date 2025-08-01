@@ -41,9 +41,9 @@ jobs:
           find /home/runner/ -iname "config.xml"  -type f|while read F;do sed -i 's#https://matrix.org#https://tim.ipv9.win#g' $F;done
           echo ${{ secrets.SIGNING_KEY }} | base64 --decode > /home/runner/work/element-android/element-android/keystore.jks
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#pathTo.keystore#/home/runner/work/element-android/element-android/keystore.jks#g' $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.storePassword=Secret#/signing.element.storePassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyId=Secret#/signing.element.keyId=${{ secrets.keyId }}#g" $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyPassword=Secret#/signing.element.keyPassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.storePassword=Secret#signing.element.storePassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyId=Secret#signing.element.keyId=${{ secrets.keyId }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyPassword=Secret#signing.element.keyPassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
           cat /home/runner/work/element-android/element-android/gradle.properties |grep element
       - name: Configure gradle
         uses: gradle/actions/setup-gradle@v3

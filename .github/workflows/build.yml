@@ -20,6 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [ Fdroid ]
+        arch: [arm64-v8a,universal,x86,armeabi-v7a,x86_64 ]
     # Allow all jobs on develop. Just one per PR.
     concurrency:
       group: ${{ github.ref == 'refs/heads/develop' && format('integration-tests-develop-{0}-{1}', matrix.target, github.sha) || format('build-debug-{0}-{1}', matrix.target, github.ref)  }}
@@ -54,9 +55,9 @@ jobs:
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: vector-${{ matrix.target }}-Release
+          name: vector-${{ matrix.target }}-${{ matrix.target }}-release-unsigned.apk
           path: |
-            vector-app/build/outputs/apk/*/release/*.apk
+            vector-app/build/outputs/apk/*/release/*-${{ matrix.target }}-*.apk
 
       - name: Find APKs
         run: |

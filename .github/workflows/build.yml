@@ -52,7 +52,7 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
       - name: Assemble ${{ matrix.target }} debug apk
-        run: ./gradlew assemble${{ matrix.target }}Release -Dorg.gradle.jvmargs="-Xmx8g -XX:MaxMetaspaceSize=1g" $CI_GRADLE_ARG_PROPERTIES
+        run: ./gradlew assemble${{ matrix.target }}Release signFdroidReleaseBundle -Dorg.gradle.jvmargs="-Xmx8g -XX:MaxMetaspaceSize=1g" $CI_GRADLE_ARG_PROPERTIES
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:

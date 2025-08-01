@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [ Fdroid ]
-        arch: [arm64-v8a,universal,x86,armeabi-v7a,x86_64 ]
+    #    arch: [arm64-v8a,universal,x86,armeabi-v7a,x86_64 ]
     # Allow all jobs on develop. Just one per PR.
     concurrency:
       group: ${{ github.ref == 'refs/heads/develop' && format('integration-tests-develop-{0}-{1}', matrix.target, github.sha) || format('build-debug-{0}-{1}', matrix.target, github.ref)  }}
@@ -55,15 +55,15 @@ jobs:
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: vector-${{ matrix.target }}-${{ matrix.arch }}-release-unsigned.apk
+          name: vector-${{ matrix.target }}-arm64-v8a-release-unsigned.apk
           path: |
-            vector-app/build/outputs/apk/*/release/*${{ matrix.arch }}*.apk
+            vector-app/build/outputs/apk/*/release/*arm64-v8a*.apk
 
       - name: Find APKs
         run: |
           APK_FILE=$(find vector-app/build/outputs/apk/ -name '*.apk')
           echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
-          echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV
+          echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV 2>/dev/null
 
       - name: Show APKs SHA256
         if: success()

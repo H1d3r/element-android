@@ -61,7 +61,7 @@ jobs:
 
       - name: Find APKs
         run: |
-          APK_FILE=$(find vector-app/build/outputs/apk/ -name '*.apk')
+          APK_FILE=$(find /home/runner/work/element-android/ -name '*.apk')
           echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
           echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV 2>/dev/null
 

@@ -73,20 +73,21 @@ jobs:
  #         path: ${{ env.APK_FILE }}
  #         compression-level: 9
 
-  push_to_canary_group:
-    #if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    name: Push to Canary Group
-    needs: debug
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
+  # push_to_canary_group:
+  #   #if: github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   name: Push to Canary Group
+  #   needs: debug
+  #   steps:
+  #     - name: Download Artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         path: artifacts
 
       - name: Find Artifacts
         run: |
-          echo "APK_FILE_CANARY=$(find artifacts -name '*.apk')" >> $GITHUB_ENV
+          echo "APK_FILE_CANARY=$(find /home/runner/work/element-android/ -name '*.apk')" >> $GITHUB_ENV
+        # echo "APK_FILE_CANARY=$(find artifacts -name '*.apk')" >> $GITHUB_ENV
 
       - name: Post to Canary Group
         env:

@@ -46,7 +46,7 @@ jobs:
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.storePassword=Secret#signing.element.storePassword=123456#g' $F;done
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.keyId=Secret#signing.element.keyId=${{ secrets.keyId }}#g' $F;done
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.keyPassword=Secret#signing.element.keyPassword=123456#g' $F;done
-          cat /home/runner/work/element-android/element-android/build.gradle | grep -i enable
+          cat /home/runner/work/element-android/element-android/vector-app/build.gradle | grep -i enable
       - name: Configure gradle
         uses: gradle/actions/setup-gradle@v3
         with:

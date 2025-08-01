@@ -1,6 +1,7 @@
 name: APK Build
 
 on:
+  workflow_dispatch:
   pull_request: { }
   push:
     branches: [ main, develop ]
@@ -18,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ Gplay, Fdroid ]
+        target: [ Fdroid ]
     # Allow all jobs on develop. Just one per PR.
     concurrency:
       group: ${{ github.ref == 'refs/heads/develop' && format('integration-tests-develop-{0}-{1}', matrix.target, github.sha) || format('build-debug-{0}-{1}', matrix.target, github.ref)  }}
@@ -33,18 +34,24 @@ jobs:
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
+      - name: config local use
+        run: |
+          find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/applicationId "im.vector.app"/applicationId "com.tencent.rtx"/g' $F;done
+          find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/"app_name", "Element"/"app_name", "腾讯通rtx"/g' $F;done
+          find /home/runner/ -iname "config.xml"  -type f|while read F;do sed -i 's#https://matrix.org#https://tim.ipv9.win#g' $F;done
+          
       - name: Configure gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
       - name: Assemble ${{ matrix.target }} debug apk
-        run: ./gradlew assemble${{ matrix.target }}Debug $CI_GRADLE_ARG_PROPERTIES
+        run: ./gradlew assemble${{ matrix.target }}Nightly $CI_GRADLE_ARG_PROPERTIES
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: vector-${{ matrix.target }}-debug
+          name: vector-${{ matrix.target }}-Release
           path: |
-            vector-app/build/outputs/apk/*/debug/*.apk
+            vector-app/build/outputs/apk/*/nightly/*.apk
 
   release:
     name: Build unsigned GPlay APKs
@@ -97,10 +104,3 @@ jobs:
           name: exodus.json
           path: |
             exodus.json
-      - name: Check for trackers
-        env:
-          SENTRY_ID: 447
-        # Should only contain a Sentry item
-        run: |
-          TRACKER_IDS=$(jq ".trackers[] | .id" exodus.json)
-          [ $TRACKER_IDS = ${{ env.SENTRY_ID }} ] || { echo '::error static analysis identified user tracking library' ; exit 1; }

@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ Fdroid ]
+        target: [ Gplay,Fdroid ]
     # Allow all jobs on develop. Just one per PR.
     concurrency:
       group: ${{ github.ref == 'refs/heads/develop' && format('integration-tests-develop-{0}-{1}', matrix.target, github.sha) || format('build-debug-{0}-{1}', matrix.target, github.ref)  }}
@@ -39,19 +39,24 @@ jobs:
           find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/applicationId "im.vector.app"/applicationId "com.tencent.rtx"/g' $F;done
           find /home/runner/ -iname "build.gradle" -type f|while read F;do sed -i 's/"app_name", "Element"/"app_name", "腾讯通rtx"/g' $F;done
           find /home/runner/ -iname "config.xml"  -type f|while read F;do sed -i 's#https://matrix.org#https://tim.ipv9.win#g' $F;done
-          
+          echo ${{ secrets.SIGNING_KEY }} | base64 --decode > /home/runner/work/element-android/element-android/keystore.jks
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#pathTo.keystore#/home/runner/work/element-android/element-android/keystore.jks#g' $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.storePassword=Secret#/signing.element.storePassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyId=Secret#/signing.element.keyId=${{ secrets.keyId }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyPassword=Secret#/signing.element.keyPassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
+      
       - name: Configure gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
       - name: Assemble ${{ matrix.target }} debug apk
-        run: ./gradlew assemble${{ matrix.target }}Nightly $CI_GRADLE_ARG_PROPERTIES
+        run: ./gradlew assemble${{ matrix.target }}Release $CI_GRADLE_ARG_PROPERTIES
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
           name: vector-${{ matrix.target }}-Release
           path: |
-            vector-app/build/outputs/apk/*/nightly/*.apk
+            vector-app/build/outputs/apk/*/release/*.apk
 
   release:
     name: Build unsigned GPlay APKs

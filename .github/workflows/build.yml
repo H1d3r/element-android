@@ -55,32 +55,22 @@ jobs:
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: vector-${{ matrix.target }}-arm64-v8a-release-unsigned.apk
+          name: vector-${{ matrix.target }}-arm64-v8a-release-unsigned
           path: |
             vector-app/build/outputs/apk/*/release/*arm64-v8a*.apk
-
-      - name: Find APKs
-        run: |
-          APK_FILE=$(find /home/runner/work/element-android/ -name '*.apk')
-          echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
-          echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV 2>/dev/null
-
-      - name: Show APKs SHA256
-        if: success()
-        run: |
-          echo "### Build Success" >> $GITHUB_STEP_SUMMARY
-          echo "|Artifact|SHA256|" >> $GITHUB_STEP_SUMMARY
-          echo "|:---:|:---|" >> $GITHUB_STEP_SUMMARY
-          APK_SHA256=($(shasum -a 256 ${{ env.APK_FILE }}))
-          echo "|Canary|$APK_SHA256" >> $GITHUB_STEP_SUMMARY
-
-
-      - name: Upload APKs
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.APK_FILE_NAME }}
-          path: ${{ env.APK_FILE }}
           compression-level: 9
+  #    - name: Find APKs
+  #      run: |
+  #        APK_FILE="$(find /home/runner/work/element-android/ -name '*.apk')"
+  #        echo "APK_FILE=$APK_FILE" >> $GITHUB_ENV
+  #        echo "APK_FILE_NAME=$(basename $APK_FILE)" >> $GITHUB_ENV 2>/dev/null
+
+ #     - name: Upload APKs
+ #       uses: actions/upload-artifact@v4
+ #       with:
+ #         name: ${{ env.APK_FILE_NAME }}
+ #         path: ${{ env.APK_FILE }}
+ #         compression-level: 9
 
   push_to_canary_group:
     if: github.event_name == 'push'

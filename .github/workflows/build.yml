@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [ Fdroid ]
-    #    arch: [arm64-v8a,universal,x86,armeabi-v7a,x86_64 ]
+        arch: [arm64-v8a,universal,x86,armeabi-v7a,x86_64 ]
     # Allow all jobs on develop. Just one per PR.
     concurrency:
       group: ${{ github.ref == 'refs/heads/develop' && format('integration-tests-develop-{0}-{1}', matrix.target, github.sha) || format('build-debug-{0}-{1}', matrix.target, github.ref)  }}
@@ -42,10 +42,11 @@ jobs:
           find /home/runner/ -iname "config.xml"  -type f|while read F;do sed -i 's#https://matrix.org#https://tim.ipv9.win#g' $F;done
           echo ${{ secrets.SIGNING_KEY }} | base64 --decode > /home/runner/work/element-android/element-android/keystore.jks
           find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#pathTo.keystore#/home/runner/work/element-android/element-android/keystore.jks#g' $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.storePassword=Secret#signing.element.storePassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyId=Secret#signing.element.keyId=${{ secrets.keyId }}#g" $F;done
-          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i "s#signing.element.keyPassword=Secret#signing.element.keyPassword=${{ secrets.KEY_STORE_PASSWORD }}#g" $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.storePassword=Secret#signing.element.storePassword=123456#g' $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.keyId=Secret#signing.element.keyId=${{ secrets.keyId }}#g' $F;done
+          find /home/runner/ -iname "gradle.properties"  -type f|while read F;do sed -i 's#signing.element.keyPassword=Secret#signing.element.keyPassword=123456#g' $F;done
           cat /home/runner/work/element-android/element-android/gradle.properties |grep element
+          file /home/runner/work/element-android/element-android/keystore.jks
       - name: Configure gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -55,9 +56,9 @@ jobs:
       - name: Upload ${{ matrix.target }} debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: vector-${{ matrix.target }}-arm64-v8a-release-unsigned
+          name: vector-${{ matrix.target }}-${{ matrix.arch }}.zip
           path: |
-            vector-app/build/outputs/apk/*/release/*arm64-v8a*.apk
+            vector-app/build/outputs/apk/*/release/*${{ matrix.arch }}*.apk
           compression-level: 9
   #    - name: Find APKs
   #      run: |
@@ -73,7 +74,7 @@ jobs:
  #         compression-level: 9
 
   push_to_canary_group:
-    if: github.event_name == 'push'
+    #if: github.event_name == 'push'
     runs-on: ubuntu-latest
     name: Push to Canary Group
     needs: debug
